@@ -8,6 +8,7 @@ import (
 )
 
 func startRepl() {
+
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
 		fmt.Print("Pokedex > ")
@@ -23,11 +24,15 @@ func startRepl() {
 			continue
 		}
 
-		command := input[0]
+		command, ok := getCommands()[input[0]]
 
-		switch command {
-		case "exit":
-			commandExit()
+		if ok {
+			err := command.callback()
+			if err != nil {
+				fmt.Printf("Error running command '%s', %v:", command.name, err)
+			}
+		} else {
+			fmt.Println("Unknown Command")
 		}
 
 	}
