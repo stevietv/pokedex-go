@@ -6,7 +6,7 @@ import (
 )
 
 func commandMap(cfg *config) error {
-	mapResponse, err := cfg.pokeapiClient.ListLocations(cfg.nextLocations)
+	mapResponse, err := cfg.pokeapiClient.ListLocations(cfg.nextLocations, cfg.pokecache)
 	if err != nil {
 		return err
 	}
@@ -26,7 +26,7 @@ func commandMapBack(cfg *config) error {
 		return errors.New("you're on the first page")
 	}
 
-	mapResponse, err := cfg.pokeapiClient.ListLocations(cfg.prevLocations)
+	mapResponse, err := cfg.pokeapiClient.ListLocations(cfg.prevLocations, cfg.pokecache)
 	if err != nil {
 		return err
 	}
