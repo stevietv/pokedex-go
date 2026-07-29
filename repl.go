@@ -5,9 +5,17 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/stevietv/pokedexgo/internal/pokeapi"
 )
 
-func startRepl() {
+type config struct {
+	pokeapiClient pokeapi.Client
+	nextLocations *string
+	prevLocations *string
+}
+
+func startRepl(cfg *config) {
 
 	scanner := bufio.NewScanner(os.Stdin)
 	for {
@@ -16,6 +24,7 @@ func startRepl() {
 
 		if err := scanner.Err(); err != nil {
 			fmt.Fprintln(os.Stderr, "Error reading input: ", err)
+			fmt.Println()
 		}
 
 		input := cleanInput(scanner.Text())
@@ -27,9 +36,10 @@ func startRepl() {
 		command, ok := getCommands()[input[0]]
 
 		if ok {
-			err := command.callback()
+			err := command.callback(cfg)
 			if err != nil {
-				fmt.Printf("Error running command '%s', %v:", command.name, err)
+				fmt.Printf("Error running command '%s': %v", command.name, err)
+				fmt.Println()
 			}
 		} else {
 			fmt.Println("Unknown Command")

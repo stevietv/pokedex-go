@@ -1,54 +1,41 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 )
 
-func commandMap() error {
-
-	if nextLocations == "" {
-		return errors.New("no more locations")
-	}
-
-	res, err := http.Get(nextLocations)
+func commandMap(cfg *config) error {
+	mapResponse, err := cfg.pokeapiClient.ListLocations(cfg.nextLocations)
 	if err != nil {
 		return err
 	}
 
-	body, err := io.ReadAll(res.Body)
-	defer res.Body.Close()
-	if res.StatusCode > 299 {
-		return fmt.Errorf("response failed with status code: %d", res.StatusCode)
-	}
-	if err != nil {
-		return err
-	}
-
-	mapResponse := mapResponse{}
-	err = json.Unmarshal(body, &mapResponse)
-	if err != nil {
-		return err
-	}
-
-	if mapResponse.Next != nil {
-		nextLocations = *mapResponse.Next
-	} else {
-		nextLocations = ""
-	}
-
-	if mapResponse.Previous != nil {
-		prevLocations = *mapResponse.Previous
-	} else {
-		prevLocations = ""
-	}
+	cfg.nextLocations = mapResponse.Next
+	cfg.prevLocations = mapResponse.Previous
 
 	for _, location := range mapResponse.Results {
 		fmt.Println(location.Name)
 	}
 
+	return nil
+}
+
+func commandMapBack(cfg *config) error {
+	if cfg.prevLocations == nil {
+		return errors.New("you're on the first page")
+	}
+
+	mapResponse, err := cfg.pokeapiClient.ListLocations(cfg.prevLocations)
+	if err != nil {
+		return err
+	}
+
+	cfg.nextLocations = mapResponse.Next
+	cfg.prevLocations = mapResponse.Previous
+
+	for _, location := range mapResponse.Results {
+		fmt.Println(location.Name)
+	}
 	return nil
 }
