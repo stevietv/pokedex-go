@@ -5,17 +5,15 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-
-	"github.com/stevietv/pokedexgo/internal/pokecache"
 )
 
-func (c *Client) ListLocations(pageURL *string, cache *pokecache.Cache) (MapResponse, error) {
+func (c *Client) ListLocations(pageURL *string) (MapResponse, error) {
 	url := baseUrl + "/location-area"
 	if pageURL != nil {
 		url = *pageURL
 	}
 
-	body, found := cache.Get(url)
+	body, found := c.cache.Get(url)
 
 	if !found {
 
@@ -47,7 +45,7 @@ func (c *Client) ListLocations(pageURL *string, cache *pokecache.Cache) (MapResp
 	}
 
 	if !found {
-		cache.Add(url, body)
+		c.cache.Add(url, body)
 	}
 
 	return mapResponse, nil

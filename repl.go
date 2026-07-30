@@ -36,9 +36,10 @@ func startRepl(cfg *config) {
 		}
 
 		command, ok := getCommands()[input[0]]
+		parameters := strings.Join(input[1:], " ")
 
 		if ok {
-			err := command.callback(cfg)
+			err := command.callback(cfg, parameters)
 			if err != nil {
 				fmt.Printf("Error running command '%s': %v", command.name, err)
 				fmt.Println()
