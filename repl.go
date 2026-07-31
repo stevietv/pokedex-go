@@ -15,6 +15,7 @@ type config struct {
 	nextLocations *string
 	prevLocations *string
 	pokecache     *pokecache.Cache
+	pokedex       map[string]pokeapi.PokemonResponse
 }
 
 func startRepl(cfg *config) {
